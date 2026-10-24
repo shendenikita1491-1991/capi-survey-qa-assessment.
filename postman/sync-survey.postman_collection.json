@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "CAPI - POST /sync-survey (duplicate local IDs)",
+    "description": "Manual / Newman version of Scenario A. Start the mock server first: npm run server. Run: npx newman run postman/sync-survey.postman_collection.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3456" },
+    { "key": "ankitUuid", "value": "" },
+    { "key": "poojaUuid", "value": "" },
+    { "key": "ankitServerId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Reset mock server",
+      "event": [{ "listen": "prerequest", "script": { "exec": [
+        "pm.collectionVariables.set('ankitUuid', pm.variables.replaceIn('{{$guid}}'));",
+        "pm.collectionVariables.set('poojaUuid', pm.variables.replaceIn('{{$guid}}'));"
+      ] } }],
+      "request": { "method": "POST", "url": "{{baseUrl}}/__reset" }
+    },
+    {
+      "name": "1. Ankit syncs School_1",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));",
+        "const r = pm.response.json().results[0];",
+        "pm.test('record created', () => pm.expect(r.status).to.eql('created'));",
+        "pm.collectionVariables.set('ankitServerId', r.server_id);"
+      ] } }],
+      "request": {
+        "method": "POST", "url": "{{baseUrl}}/sync-survey",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"device_id\": \"device-ankit\",\n  \"user_id\": \"ankit\",\n  \"records\": [{\n    \"local_id\": \"School_1\",\n    \"client_uuid\": \"{{ankitUuid}}\",\n    \"survey_id\": \"school_survey_v1\",\n    \"entity_type\": \"school\",\n    \"entity\": { \"name\": \"Govt Primary School\", \"village_code\": \"VIL-001\" },\n    \"answers\": { \"students_count\": 120 },\n    \"collected_at\": \"2026-10-23T10:00:00+05:30\"\n  }]\n}" }
+      }
+    },
+    {
+      "name": "2. Pooja syncs School_1 (same local ID, same school)",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('200 OK', () => pm.response.to.have.status(200));",
+        "const r = pm.response.json().results[0];",
+        "pm.test('new server id - Ankit not overwritten', () => pm.expect(r.server_id).to.not.eql(pm.collectionVariables.get('ankitServerId')));",
+        "pm.test('flagged as possible duplicate', () => pm.expect(r.status).to.eql('created_possible_duplicate'));"
+      ] } }],
+      "request": {
+        "method": "POST", "url": "{{baseUrl}}/sync-survey",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"device_id\": \"device-pooja\",\n  \"user_id\": \"pooja\",\n  \"records\": [{\n    \"local_id\": \"School_1\",\n    \"client_uuid\": \"{{poojaUuid}}\",\n    \"survey_id\": \"school_survey_v1\",\n    \"entity_type\": \"school\",\n    \"entity\": { \"name\": \"Govt Primary School\", \"village_code\": \"VIL-001\" },\n    \"answers\": { \"students_count\": 118 },\n    \"collected_at\": \"2026-10-23T11:00:00+05:30\"\n  }]\n}" }
+      }
+    },
+    {
+      "name": "3. Ankit retries the same batch (lost response)",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const r = pm.response.json().results[0];",
+        "pm.test('idempotent: already_synced', () => pm.expect(r.status).to.eql('already_synced'));",
+        "pm.test('same server id as first sync', () => pm.expect(r.server_id).to.eql(pm.collectionVariables.get('ankitServerId')));"
+      ] } }],
+      "request": {
+        "method": "POST", "url": "{{baseUrl}}/sync-survey",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"device_id\": \"device-ankit\",\n  \"user_id\": \"ankit\",\n  \"records\": [{\n    \"local_id\": \"School_1\",\n    \"client_uuid\": \"{{ankitUuid}}\",\n    \"survey_id\": \"school_survey_v1\",\n    \"entity_type\": \"school\",\n    \"entity\": { \"name\": \"Govt Primary School\", \"village_code\": \"VIL-001\" },\n    \"answers\": { \"students_count\": 120 },\n    \"collected_at\": \"2026-10-23T10:00:00+05:30\"\n  }]\n}" }
+      }
+    },
+    {
+      "name": "4. Verify both School_1 records exist with their own data",
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const body = pm.response.json();",
+        "pm.test('exactly two records', () => pm.expect(body.count).to.eql(2));",
+        "pm.test('Ankit data intact', () => pm.expect(body.items.find(i => i.user_id === 'ankit').answers.students_count).to.eql(120));",
+        "pm.test('Pooja data intact', () => pm.expect(body.items.find(i => i.user_id === 'pooja').answers.students_count).to.eql(118));"
+      ] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/surveys?local_id=School_1" }
+    }
+  ]
+}
