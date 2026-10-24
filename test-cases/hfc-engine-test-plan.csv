@@ -1,0 +1,19 @@
+id,category,scenario,age,age_value_type,education,sleep_well,sleep_hours,expected_rules,expected_behaviour
+HFC-01,Positive,Age under 15 with College fires the age/education rule,12,number,college,,,HFC_AGE_EDU,Re-ask age and education then flag if confirmed
+HFC-02,Positive,Sleeps well but under 6 hours fires the sleep rule,30,number,secondary,yes,4,HFC_SLEEP,Re-ask sleep questions then flag if confirmed
+HFC-03,Positive,Both rules fire together,12,number,college,yes,5,HFC_AGE_EDU|HFC_SLEEP,One combined re-ask screen listing both issues
+HFC-04,Negative,Adult with College does not fire,25,number,college,,,,Submit with no re-ask
+HFC-05,Negative,Child with Primary does not fire,12,number,primary,,,,Submit with no re-ask
+HFC-06,Negative,Does not sleep well and sleeps 4 hours is consistent,30,number,secondary,no,4,,Submit with no re-ask
+HFC-07,Negative,Sleeps well and 8 hours is consistent,30,number,secondary,yes,8,,Submit with no re-ask
+HFC-08,Boundary,Age exactly 15 is not under 15,15,number,college,,,,Rule uses strict less-than so no re-ask
+HFC-09,Boundary,Age 14 is under 15,14,number,college,,,HFC_AGE_EDU,Re-ask
+HFC-10,Boundary,Sleep exactly 6 hours is not under 6,30,number,secondary,yes,6,,No re-ask
+HFC-11,Boundary,Sleep 5.9 hours (decimal) is under 6,30,number,secondary,yes,5.9,HFC_SLEEP,Re-ask
+HFC-12,Boundary,Age 0 with College fires,0,number,college,,,HFC_AGE_EDU,Re-ask
+HFC-13,Edge,Age not answered yet does not fire,,number,college,,,,Unanswered values never trigger a rule (no false alarm while filling)
+HFC-14,Edge,Education not answered does not fire,12,number,,,,,No re-ask
+HFC-15,Edge,Sleep hours unanswered does not fire,30,number,secondary,yes,,,No re-ask
+HFC-16,Edge,Sleep 0 hours with sleep well fires,30,number,secondary,yes,0,HFC_SLEEP,Zero is a real answer and must be checked
+HFC-17,Edge,Negative sleep hours still fires (range validation should also catch it),30,number,secondary,yes,-1,HFC_SLEEP,Range check blocks first; HFC must not crash
+HFC-18,Edge,Age typed as text value 12 still compared numerically,12,string,college,,,HFC_AGE_EDU,Numbers stored as strings must still compare as numbers

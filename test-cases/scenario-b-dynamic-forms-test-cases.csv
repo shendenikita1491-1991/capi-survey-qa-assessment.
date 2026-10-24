@@ -1,0 +1,38 @@
+id,area,title,steps,expected_result,priority,automated_in
+FORM-01,Skip logic,Hobby question appears on Yes,Answer Do you have a hobby? = Yes,What is your hobby? becomes visible and editable,P1,tests/web/skip-logic.spec.js
+FORM-02,Skip logic,Hobby question stays hidden on No,Answer No,Hidden,P1,tests/web/skip-logic.spec.js
+FORM-03,Skip logic,Hidden answer is cleared,Yes -> type Cricket -> No -> Yes,Field is empty again,P1,tests/web/skip-logic.spec.js
+FORM-04,Skip logic,Hidden answer not submitted,Type hobby then switch to No and submit,hobby_name absent from submission,P1,tests/web/skip-logic.spec.js
+FORM-05,Validation,Hidden required question does not block submit,Submit with hobby = No,Submits,P1,tests/web/skip-logic.spec.js
+FORM-06,Validation,Visible required question blocks submit,Hobby = Yes and leave name empty,Error This answer is required,P1,tests/web/skip-logic.spec.js
+FORM-07,Skip logic,Chained conditions cascade,Fill hobby chain then set hobby = No,All dependent questions hidden and cleared,P1,tests/web/skip-logic.spec.js
+FORM-08,Skip logic,Numeric boundary,Age 17 / 18 / 19 / 0,Employed? shown only for 18 and above,P1,tests/web/skip-logic.spec.js
+FORM-09,Skip logic,Multi-select contains,Tick and untick Other,Specify field shows and hides,P2,tests/web/skip-logic.spec.js
+FORM-10,Roster,Member blocks follow household size,Household size 3,Exactly 3 member blocks,P1,tests/web/skip-logic.spec.js
+FORM-11,Roster,Skip logic scoped per member,Member 1 age 40 and member 2 age 10,In school? only for member 2,P1,tests/web/skip-logic.spec.js
+FORM-12,Roster,Reducing size removes data,3 -> 2 -> 3,Member 3 comes back empty,P1,tests/web/skip-logic.spec.js
+FORM-13,Roster,Adding a member keeps others,1 -> 2,Member 1 answers kept,P1,tests/web/skip-logic.spec.js
+FORM-14,Roster,Roster submission shape,Submit with 2 members,members array with only visible fields,P1,tests/web/skip-logic.spec.js
+FORM-15,Generated,Every skip rule shown/hidden,Auto-generated from schema,2 tests per rule pass,P1,tests/web/schema-driven.spec.js
+FORM-16,Generated,Every question rendered once,Load form,Each question id present exactly once,P1,tests/web/schema-driven.spec.js
+FORM-17,Contract,Schema contract,Validate every schema in /schema,No errors,P1,tests/unit/schema-contract.spec.js
+FORM-18,Contract,Builder regressions caught,13 mutated schemas,Each mutation reported,P1,tests/unit/schema-contract.spec.js
+FORM-19,Mobile viewport,Same suite on a 360px phone screen,Run project web-mobile,All pass,P2,playwright.config.js (web-mobile)
+FORM-20,Performance,Large roster,Household size 30 with 5 questions each on a 4GB phone,Renders under 2 s; no ANR; scrolling smooth,P2,Manual + Android Macrobenchmark
+FORM-21,Localisation,Hindi / long labels,Switch language,Labels wrap; no clipped text,P2,Manual exploratory
+FORM-22,Exploratory,Unusual answer order,Answer later questions first then change earlier ones,No stale visible questions or saved hidden data,P1,Manual exploratory
+FORM-23,Provided schema,Hobby skip rule on the real schema (survey 3),Do you have a hobby? = Yes,What is your hobby? (If Yes) visible and editable,P1,tests/web/provided-schema.spec.js
+FORM-24,Provided schema,Hobby answer cleared and not submitted when switched to No,Yes -> type -> No -> submit,Hidden answer absent from submission,P1,tests/web/provided-schema.spec.js
+FORM-25,Provided schema,Required dropdowns,Submit empty survey 3,Errors on q_1 q_3 q_5 q_6,P1,tests/web/provided-schema.spec.js
+FORM-26,Provided schema,All 8 skip rules across 3 surveys (generated),Set target to matching value then another value,Follow-up shown then hidden,P1,tests/web/provided-schema.spec.js
+FORM-27,Provided schema,Original file with JSON error,Load schema/provided/3.Sample_Survey_Schema.json,Clear error message; no partial form; no submit button,P1,tests/web/provided-schema.spec.js
+FORM-28,Provided schema,Contract audit (22 rules),Run audit on the provided schema,"Known defects PS-01..PS-09, PS-19, PS-20 reported as expected failures; no unknown findings",P1,tests/unit/provided-schema-audit.spec.js
+FORM-29,Android spec,enabled=false means always visible,Load android-spec-hfc.json,q_1 q_2 q_3 visible on load,P1,tests/web/android-spec-hfc.spec.js
+FORM-30,HFC reask_once,Android spec example: hours > 16,Hours 20 -> submit -> Change answers -> submit again,Re-asked once; second submit accepted with flag accepted_after_reask severity Soft,P1,tests/web/android-spec-hfc.spec.js
+FORM-31,HFC reask_once,Re-ask leads to correction,Hours 20 -> re-ask -> change to 8,Submitted with no flag,P1,tests/web/android-spec-hfc.spec.js
+FORM-32,HFC boundary,Strictly greater than 16,Hours 16 / 16.5 / 24 / 0,Re-ask only for 16.5 and 24,P1,tests/web/android-spec-hfc.spec.js
+FORM-33,Validation order,Range validation runs before HFC,Hours 25,Error Must be at most 24; no HFC prompt,P1,tests/web/android-spec-hfc.spec.js
+FORM-34,HFC block,Hard block cannot be confirmed away,Age 3 -> submit 3 times -> correct to 6,Blocked each time with no accept button; submits after correction,P1,tests/web/android-spec-hfc.spec.js
+FORM-35,HFC flag_silently,Observation flagged without prompt,Age 105,No prompt; submission carries flag flagged_silently,P2,tests/web/android-spec-hfc.spec.js
+FORM-36,Display order,Android spec display order,Load form,Section title > section checklist > question > hint > input > checklist guide,P2,tests/web/android-spec-hfc.spec.js
+FORM-37,Reference specs,Spec documents vs schema consistency,Run reference-specs tests,PS-21 PS-22 PS-23 reported as expected failures,P2,tests/unit/reference-specs.spec.js

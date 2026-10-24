@@ -1,0 +1,24 @@
+id,area,title,preconditions,steps,expected_result,priority,automated_in
+SYNC-01,Duplicate IDs,Two devices send the same local_id,Empty server,"1. Ankit syncs School_1 2. Pooja syncs School_1","Two server records with different server_ids; each keeps its own answers",P1,tests/api/sync-survey.spec.js
+SYNC-02,Duplicate IDs,Two devices send the same local_id at the same instant,Empty server,Send both batches in parallel 25 times,Always exactly two intact records; no lost update,P1,tests/api/sync-survey.spec.js
+SYNC-03,Duplicate IDs,Same real school from two workers is flagged,Ankit's school already synced,Pooja syncs same school name (different spelling/case) and village,Stored as a new record with possible_duplicate flag linking to Ankit's; nothing merged,P1,tests/api/sync-survey.spec.js
+SYNC-04,Duplicate IDs,Same name in a different village is not flagged,Ankit's school synced,Pooja syncs same name with another village_code,Status created; no duplicate flag,P2,tests/api/sync-survey.spec.js
+SYNC-05,Duplicate IDs,Local ID reused after app reinstall,One record synced from device,Same device sends School_1 with a new client_uuid,New record created; old one untouched,P1,tests/api/sync-survey.spec.js
+SYNC-06,Idempotency,Full batch retried after response was lost,Batch already synced,Send the identical batch again,already_synced with the same server_id; record count unchanged,P1,tests/api/sync-survey.spec.js
+SYNC-07,Idempotency,Idempotency-Key replay,First call made with a key,Repeat with same key,Identical status and body; Idempotent-Replay header true,P1,tests/api/sync-survey.spec.js
+SYNC-07b,Idempotency,Idempotency-Key reused with a different body,First call made with a key,Repeat with same key but another record,422; nothing stored from the second call,P1,tests/api/sync-survey.spec.js
+SYNC-08,Idempotency,Same client_uuid but different answers,Record synced,Resend with changed answers,409 conflict; stored answers unchanged,P1,tests/api/sync-survey.spec.js
+SYNC-08b,Idempotency,Mixed batch: one conflict + one new record,Record synced,Send changed version of it plus a new record,207 with per-record statuses conflict and created; new record saved; original unchanged,P1,tests/api/sync-survey.spec.js
+SYNC-09,Idempotency,Partial batch retry,1 of 2 records synced,Send both,Statuses already_synced and created; total 2,P1,tests/api/sync-survey.spec.js
+SYNC-10,Validation,Missing or invalid fields,None,"Remove device_id / user_id / local_id / client_uuid; bad UUID; answers not object; bad date; empty records",400 with field-level error; nothing stored,P2,tests/api/sync-survey.spec.js
+SYNC-11,Validation,Malformed JSON,None,Send truncated JSON,400 Invalid JSON,P2,tests/api/sync-survey.spec.js
+SYNC-12,Validation,Batch too large,None,Send 101 records,413; app must split into chunks,P2,tests/api/sync-survey.spec.js
+SYNC-13,Data integrity,Unicode / Hindi text,None,Sync Hindi school name and remarks,Stored byte-for-byte,P2,tests/api/sync-survey.spec.js
+SYNC-14,Load,Thundering herd at 5 PM (behaviour),None,150 devices sync at once then retry after Retry-After,No 500s; load is actually shed; overload gets 429/503 + Retry-After; all 150 stored exactly once,P1,tests/api/sync-survey.spec.js
+SYNC-14b,Load,50000-device spike (capacity),Staging environment,k6 ramp 0 -> 50000 virtual devices in 2-5 min then soak,p95 < 2 s; 5xx < 0.1%; zero lost or duplicated records,P1,Planned: k6 against staging
+SYNC-15,Load,Single device in a retry loop,None,One device sends 12 requests at once,Some 429 with Retry-After,P2,tests/api/sync-survey.spec.js
+SYNC-16,Regression proof,Tests catch the overwrite bug,Server started with MOCK_BUG=overwrite,npm run verify:buggy,The duplicate-ID and idempotency tests fail while validation tests still pass,P1,npm run verify:buggy (CI)
+SYNC-17,Security,Auth token of another user,Two users,Ankit's device sends a batch with Pooja's user_id,403 (not in mock - needs real auth),P1,Manual / future
+SYNC-18,Photos,Photo upload interrupted at 99%,Charles throttling,Drop connection near end of multipart upload,Upload resumes or restarts; survey not marked synced until photo confirmed; no orphan record,P1,Manual (README Scenario A2)
+SYNC-19,Time,Device clock wrong by days,Device date set to 2020,Sync,Server keeps collected_at as sent but records received_at; flags impossible dates,P2,Manual
+SYNC-20,Schema,Survey collected on old schema version,Server has schema v4,Sync answers from v3,Accepted and mapped by schema_version; not rejected,P1,Manual / future contract test

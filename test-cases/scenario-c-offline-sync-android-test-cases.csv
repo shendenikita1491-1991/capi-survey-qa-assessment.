@@ -1,0 +1,17 @@
+id,area,title,steps,expected_result,tools,priority
+AND-01,Room DB,Offline survey saved locally,Airplane mode -> fill and save survey -> pull DB with run-as,Row in surveys table with sync_status=PENDING and all answers,adb run-as + sqlite3 / DB Browser,P1
+AND-02,Room DB,Saved survey survives app kill,Save offline -> adb shell am force-stop -> reopen,Survey still listed and unchanged,adb,P1
+AND-03,Room DB,Saved survey survives reboot,Save offline -> adb reboot,Survey still pending; sync job still scheduled,adb,P1
+AND-04,WorkManager,Sync job scheduled when offline,Save offline -> dumpsys jobscheduler,Job present with network constraint unmet,adb shell dumpsys jobscheduler,P1
+AND-05,WorkManager,Force sync now,adb shell cmd jobscheduler run -f <pkg> <jobId>,Job runs; request seen in Charles,adb + Charles,P1
+AND-06,WorkManager,Sync on network restore,Airplane mode off,Job runs within seconds; status becomes SYNCED with server_id stored,adb + Charles,P1
+AND-07,Retry,Server returns 500,Charles Rewrite (Response Status = 500) or a Breakpoint edits the response to 500,Row stays PENDING; WorkSpec back to ENQUEUED with run_attempt_count +1; backoff; no data loss,Charles + adb dumpsys + workdb,P1
+AND-08,Retry,Server returns 429/503 with Retry-After,Charles rewrite,App waits at least Retry-After before next attempt,Charles,P1
+AND-09,Retry,Response lost after server saved data,Charles drops response after request completes,Retry produces already_synced not a duplicate,Charles,P1
+AND-10,Photos,Network drops at 99% of photo upload,Charles throttle 2G then disable network near end,Upload restarts/resumes; survey not marked synced until photo confirmed,Charles + adb svc wifi/data,P1
+AND-11,Process death,App killed during sync,Start sync then adb shell am kill,WorkManager re-runs job; no duplicate,adb,P1
+AND-12,Battery,Doze mode,adb shell dumpsys battery unplug -> adb shell dumpsys deviceidle force-idle (then unforce and battery reset),Sync deferred then runs in maintenance window,adb,P2
+AND-13,Storage,Low storage while saving,Fill disk with adb shell dd,Clear error; existing data not corrupted,adb,P1
+AND-14,Upgrade,App update with DB migration,Install old APK -> save offline -> install new APK,Pending survey migrated and still syncs,adb install -r,P1
+AND-15,Security,Release build not debuggable,run-as on release APK,Fails as expected; use debug or staging build for DB inspection,adb,P2
+AND-16,Photos,Upload longer than 10 minutes on 2G,3-5 MB photo with upload throttled to 30 kbps,Upload completes via chunked/resumable upload or a foreground worker; not stopped by WorkManager's 10-minute limit and retried forever,Charles / mitmproxy throttling + adb logcat WM-WorkerWrapper,P1

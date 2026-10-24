@@ -1,0 +1,15 @@
+id,check,how_to_test,pass_criteria,severity_if_failed
+UX-01,Touch target size,Measure with Layout Inspector / Accessibility Scanner,All tappable elements at least 48x48 dp,High
+UX-02,Next button reachable,Open Training Video Hub on a 5-inch 720p phone,Primary action visible without scrolling (sticky bottom bar),High
+UX-03,Text density,Count words above the action; read with a non-literate tester,Short sentences; icons or audio for key info; no 3-paragraph blocks,High
+UX-04,Contrast in sunlight,Accessibility Scanner + test outdoors at noon at 50% brightness,Text contrast at least 4.5:1 (7:1 preferred); no light-grey text,High
+UX-05,Audio alternative,Turn on TalkBack / tap play-audio icon,Description available as audio in local language,High
+UX-06,Video on budget phone,Play 3-4 videos back to back on 4GB RAM device,No ANR; memory returns to baseline; low-res option available,High
+UX-07,Offline video,Airplane mode,Downloaded video plays; clear message and icon if not downloaded,High
+UX-08,Font scaling,Settings font size largest,No clipped or overlapping text; buttons still visible,Medium
+UX-09,Localisation length,Switch to Hindi / Marathi,Labels fit; no truncation; correct script rendering,Medium
+UX-10,Icons and colour meaning,Show screen to field workers without explanation,Icons understood; colour never the only signal (add icon + text),Medium
+UX-11,Progress and completion,Watch video to end,Clear visual sign the module is complete,Medium
+UX-12,Error recovery,Interrupt video with a call / low battery,Resumes from same point,Medium
+UX-13,Small screen layout,360x640 dp emulator,Video + controls + Next fit sensibly; no horizontal scroll,Medium
+UX-14,Data usage,Stream on 2G,Warning before large download; resume support,Medium
