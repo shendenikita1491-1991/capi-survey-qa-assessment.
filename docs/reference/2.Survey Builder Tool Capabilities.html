@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Survey Builder — Workings</title>
+<style>
+  :root{
+    --ink:#1a2a2a; --ink2:#475569; --ink3:#6b7280; --line:#e2e8f0; --line2:#cbd5e1;
+    --brand:#2f4f4f; --accent:#2563eb; --accent-bg:#eff6ff; --bg:#f1f3f5; --card:#fff;
+    --green:#10b981; --green-bg:#ecfdf5; --amber:#d97706; --amber-bg:#fef3c7;
+    --purple:#7c3aed; --purple-bg:#f5f3ff; --red:#dc2626; --red-bg:#fee2e2;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Verdana,'Noto Sans',sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:32px}
+  /* Sidebar / TOC */
+  nav.toc{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;width:250px;flex-shrink:0;padding:28px 0 40px}
+  nav.toc .brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--brand);letter-spacing:.06em;text-transform:uppercase;font-size:13px;margin-bottom:18px}
+  nav.toc .brand .logo{width:30px;height:30px;border-radius:6px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+  nav.toc a{display:block;color:var(--ink2);text-decoration:none;font-size:13.5px;padding:5px 12px;border-left:2px solid transparent;border-radius:0 4px 4px 0}
+  nav.toc a:hover{color:var(--accent);background:#fff;border-left-color:var(--accent)}
+  nav.toc .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin:16px 12px 4px;font-weight:700}
+  /* Main */
+  main{flex:1;min-width:0;background:var(--card);margin:24px 0;padding:40px 48px;border-radius:10px;box-shadow:0 1px 16px rgba(0,0,0,.06)}
+  header.doc{border-bottom:3px solid var(--brand);padding-bottom:20px;margin-bottom:8px}
+  header.doc h1{font-size:30px;line-height:1.15;color:var(--ink)}
+  header.doc .sub{color:var(--ink3);margin-top:6px;font-size:14px}
+  header.doc .meta{margin-top:12px;font-size:12px;color:var(--ink3)}
+  section{padding:30px 0;border-bottom:1px solid var(--line)}
+  section:last-child{border-bottom:none}
+  h2{font-size:21px;color:var(--brand);margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  h2 .n{font-size:12px;background:var(--brand);color:#fff;border-radius:5px;padding:2px 8px;font-weight:700}
+  h3{font-size:15.5px;color:var(--ink);margin:18px 0 8px}
+  p{margin:8px 0;color:var(--ink2)}
+  ul,ol{margin:8px 0 8px 22px;color:var(--ink2)}
+  li{margin:3px 0}
+  code{font-family:'Courier New',monospace;background:#f1f5f9;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:12.5px;color:#0f172a}
+  .lead{font-size:15.5px;color:var(--ink2)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th,td{text-align:left;padding:8px 11px;border:1px solid var(--line);vertical-align:top}
+  th{background:#f8fafc;font-weight:700;color:var(--ink);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  tr:nth-child(even) td{background:#fcfcfd}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:2px 8px;white-space:nowrap;border:1px solid transparent}
+  .p-blue{color:var(--accent);background:var(--accent-bg);border-color:#bfdbfe}
+  .p-green{color:#065f46;background:var(--green-bg);border-color:#a7f3d0}
+  .p-amber{color:#92400e;background:var(--amber-bg);border-color:#fde68a}
+  .p-purple{color:var(--purple);background:var(--purple-bg);border-color:#ddd6fe}
+  .p-red{color:var(--red);background:var(--red-bg);border-color:#fecaca}
+  .p-grey{color:#475569;background:#eef1f5;border-color:#dde2e8}
+  .note{border-left:4px solid var(--accent);background:var(--accent-bg);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:13.5px;color:#1e3a8a}
+  .note.green{border-left-color:var(--green);background:var(--green-bg);color:#065f46}
+  .note.amber{border-left-color:var(--amber);background:var(--amber-bg);color:#92400e}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .ico{font-size:17px}
+  pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:14px 16px;overflow:auto;font-size:12px;line-height:1.55;margin:12px 0}
+  pre .k{color:#7dd3fc}.pre .s{color:#86efac}
+  .types td:first-child{white-space:nowrap;font-weight:600}
+  @media (max-width:900px){.wrap{flex-direction:column}nav.toc{position:static;height:auto;width:auto}main{padding:28px 20px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="toc">
+    <div class="brand"><span class="logo">MK</span> MOCK</div>
+    <div class="grp">Foundations</div>
+    <a href="#overview">1. Overview</a>
+    <a href="#structure">2. Survey Structure</a>
+    <a href="#types">3. Question Types</a>
+    <div class="grp">Per-question config</div>
+    <a href="#flags">4. Flags &amp; Attributes</a>
+    <a href="#hints">5. Hints, Media &amp; Checklists</a>
+    <a href="#options">6. Options &amp; Images</a>
+    <a href="#validation">7. Validation Rules</a>
+    <a href="#skip">8. Skip Logic (Visibility)</a>
+    <div class="grp">Advanced elements</div>
+    <a href="#matrix">9. Matrix Questions</a>
+    <a href="#roster">10. Roster (Repeat)</a>
+    <a href="#hfc">11. HFC / Form-Checks</a>
+    <a href="#lookup">12. Lookups &amp; Attachments</a>
+    <div class="grp">Output &amp; lifecycle</div>
+  </nav>
+
+  <main>
+    <header class="doc">
+      <h1>Survey Builder — Capabilities</h1>
+      <div class="sub">A reference of everything the form builder can currently model, configure and produce.</div>
+    </header>
+
+    <!-- 1 -->
+    <section id="overview">
+      <h2><span class="n">1</span> Overview</h2>
+      <p class="lead">The builder is a visual, drag-and-drop tool for authoring field surveys. A form is built once in English and then translated; the Android field app and printed training material are generated from the same schema.</p>
+      <ul>
+        <li><b>Author</b> sections and questions across <b>20 input types</b> with rich per-question configuration.</li>
+        <li><b>Control flow</b> with skip logic (visibility) and repeating rosters.</li>
+        <li><b>Quality</b> with validation rules and High-Frequency Checks (HFC / form-checks).</li>
+        <li><b>Localize</b> into Hindi, Marathi, Gujarati and Kannada (AI-assisted + manual).</li>
+        <li><b>Produce</b> a language-specific mobile schema, a printable enumerator training document, and standard exports (XLSForm, XML, JSON).</li>
+      </ul>
+    </section>
+
+    <!-- 2 -->
+    <section id="structure">
+      <h2><span class="n">2</span> Survey Structure</h2>
+      <p>Every survey follows a simple nesting model:</p>
+      <pre><span class="k">Form</span> (title, description, version, language)
+ └─ <span class="k">Section</span> (title, section checklist)
+     └─ <span class="k">Question</span> (questionId, type, text, config…)
+         └─ <span class="k">Roster sub-question</span> (same shape, repeats per row)</pre>
+      <table>
+        <tr><th>Level</th><th>Key fields</th></tr>
+        <tr><td>Form</td><td><code>id</code>, <code>title</code>, <code>description</code>, <code>version</code>, <code>language</code>, <code>sections[]</code></td></tr>
+        <tr><td>Section</td><td><code>sectionId</code>, <code>title</code>, <code>checklistGuide[]</code>, <code>items[]</code></td></tr>
+        <tr><td>Question</td><td><code>questionId</code>, <code>inputType</code>, <code>questionText</code>, + config blocks below</td></tr>
+      </table>
+    </section>
+
+    <!-- 3 -->
+    <section id="types">
+      <h2><span class="n">3</span> Question Types</h2>
+      <p>Twenty input types are available. Quick-access types in the inline bar: Text, Number, Dropdown, Radio, Checkbox, Date, Long Text.</p>
+      <table class="types">
+        <tr><th>Type</th><th>Label</th><th>Purpose</th><th>Notable config</th></tr>
+        <tr><td><span class="ico">📝</span> Text</td><td>Short Text</td><td>Single-line text answer</td><td>validations</td></tr>
+        <tr><td><span class="ico">📄</span> TextArea</td><td>Long Text</td><td>Multi-line paragraph</td><td>validations</td></tr>
+        <tr><td><span class="ico">🔢</span> Number</td><td>Number</td><td>Integer or decimal value</td><td><code>min</code>/<code>max</code>, drives roster repeat count</td></tr>
+        <tr><td><span class="ico">▾</span> Dropdown</td><td>Dropdown</td><td>Pick one from a list</td><td>options (text/image)</td></tr>
+        <tr><td><span class="ico">⊙</span> Radio</td><td>Radio</td><td>Single choice, all visible</td><td>options (text/image)</td></tr>
+        <tr><td><span class="ico">☑</span> Checkbox</td><td>Checkbox</td><td>Multiple selections</td><td>options (text/image)</td></tr>
+        <tr><td><span class="ico">⊞</span> Matrix</td><td>Matrix Grid</td><td>Grid of rows &amp; columns</td><td><code>matrixConfig</code> (3 modes)</td></tr>
+        <tr><td><span class="ico">📅</span> Date</td><td>Date</td><td>Calendar date picker</td><td>—</td></tr>
+        <tr><td><span class="ico">🖼</span> Image</td><td>Photo</td><td>Take or upload a photo</td><td>—</td></tr>
+        <tr><td><span class="ico">🎙</span> Audio</td><td>Audio</td><td>Record an audio clip</td><td>—</td></tr>
+        <tr><td><span class="ico">📍</span> GPS</td><td>GPS</td><td>Capture GPS coordinates (also used for land/parcel capture)</td><td>—</td></tr>
+        <tr><td><span class="ico">📋</span> Roster</td><td>Roster</td><td>Repeat a block for each member/row</td><td><code>items[]</code>, <code>iterationQuestionId</code></td></tr>
+        <tr><td><span class="ico">ℹ</span> Note</td><td>Note/Info</td><td>Display-only instruction (no answer)</td><td>—</td></tr>
+      </table>
+    </section>
+
+    <!-- 4 -->
+    <section id="flags">
+      <h2><span class="n">4</span> Flags &amp; Attributes</h2>
+      <p>Every question can carry behaviour flags and a core-attribute mapping.</p>
+      <table>
+        <tr><th>Flag</th><th>Field</th><th>Meaning</th></tr>
+        <tr><td><span class="pill p-red">Required</span></td><td><code>isRequired</code></td><td>Answer mandatory before proceeding.</td></tr>
+        <tr><td><span class="pill p-amber">Sensitive</span></td><td><code>isSensitive</code></td><td>Personal/confidential — ask privately; encrypted handling.</td></tr>
+        <tr><td><span class="pill p-blue">Read-only</span></td><td><code>isReadonly</code></td><td>Displayed but not editable.</td></tr>
+        <tr><td><span class="pill p-grey">Hidden</span></td><td><code>isHidden</code></td><td>Stored/used but not shown to the enumerator.</td></tr>
+        <tr><td><span class="pill p-purple">Audio Audit</span></td><td><code>audio_audit</code></td><td>Background audio recording during this question for QA.</td></tr>
+      </table>
+      <h3>Core Attribute mapping</h3>
+      <p>Questions can be linked to a <b>Core Attribute</b> (e.g. AGE, GENDER, INCOME) from the catalog <code>master_core_attribute</code>. These codes are what HFC rules reference, so checks work consistently across forms.</p>
+    </section>
+
+    <!-- 5 -->
+    <section id="hints">
+      <h2><span class="n">5</span> Hints, Media &amp; Checklists</h2>
+      <p>Training content attached to a question (and shown in the Training Document):</p>
+      <table>
+        <tr><th>Element</th><th>Field</th><th>Notes</th></tr>
+        <tr><td>Hint — “How to ask”</td><td><code>hintText[]</code></td><td>Guidance on how to ask / what to learn.</td></tr>
+        <tr><td>Reference media</td><td><code>hintMedia[]</code></td><td>Images (rendered inline), plus audio/video references. Each: <code>{type,name,size,dataUrl}</code>.</td></tr>
+        <tr><td>Enumerator note</td><td><code>trainingNote</code></td><td>Extra instruction beneath the question.</td></tr>
+        <tr><td>Question checklist</td><td><code>checklistGuide[]</code></td><td>Per-question “before you record” checklist.</td></tr>
+        <tr><td>Section checklist</td><td>section <code>checklistGuide[]</code></td><td>Shown between the section header and its questions.</td></tr>
+      </table>
+    </section>
+
+    <!-- 6 -->
+    <section id="options">
+      <h2><span class="n">6</span> Options &amp; Images</h2>
+      <p>Choice questions (Dropdown, Radio, Checkbox) hold an <code>options</code> array. Each option may be a plain string or an object with an image:</p>
+      <pre>"options": [
+  "Plain text option",
+  { <span class="k">"type"</span>: "image", <span class="k">"label"</span>: "Pit latrine", <span class="k">"image"</span>: "data:image/png;base64,…" }
+]</pre>
+      <p>Option images render beside the label in preview and in the training document — useful for picture-based choices (e.g. toilet/house types) for low-literacy respondents.</p>
+    </section>
+
+    <!-- 7 -->
+    <section id="validation">
+      <h2><span class="n">7</span> Validation Rules</h2>
+      <p>Each question can hold a list of <code>validations</code>, each <code>{type, value, message}</code>. Available types:</p>
+      <table>
+        <tr><th>Type</th><th>Use</th></tr>
+        <tr><td><code>min_length</code> / <code>max_length</code></td><td>Character-count bounds for text.</td></tr>
+        <tr><td><code>min_value</code> / <code>max_value</code></td><td>Numeric bounds.</td></tr>
+        <tr><td><code>regex</code></td><td>Custom pattern match.</td></tr>
+        <tr><td><code>email</code> / <code>phone</code> / <code>url</code></td><td>Format presets.</td></tr>
+        <tr><td><code>custom</code></td><td>Custom expression.</td></tr>
+      </table>
+      <div class="note">Validation enforces <b>format correctness</b> at entry time. For plausibility / cross-field logic that should warn or re-ask (but not strictly block), use <b>HFC form-checks</b> (§11).</div>
+    </section>
+
+    <!-- 8 -->
+    <section id="skip">
+      <h2><span class="n">8</span> Skip Logic (Visibility)</h2>
+      <p>Any question can be shown conditionally via <code>visibilityLogic</code>:</p>
+      <pre>"visibilityLogic": {
+  <span class="k">"enabled"</span>: true,
+  <span class="k">"targetQuestion"</span>: "q_has_illness",
+  <span class="k">"condition"</span>: "equals",
+  <span class="k">"value"</span>: "Yes"
+}</pre>
+      <p>Supported conditions:</p>
+      <p>
+        <span class="pill p-grey">equals</span>
+        <span class="pill p-grey">not_equals</span>
+        <span class="pill p-grey">contains</span>
+        <span class="pill p-grey">greater_than</span>
+        <span class="pill p-grey">less_than</span>
+        <span class="pill p-grey">is_empty</span>
+        <span class="pill p-grey">is_not_empty</span>
+      </p>
+      <p><code>is_empty</code> / <code>is_not_empty</code> don't need a value. The target is referenced by its <code>questionId</code>.</p>
+    </section>
+
+    <!-- 9 -->
+    <section id="matrix">
+      <h2><span class="n">9</span> Matrix Questions</h2>
+      <p>A grid of <b>rows</b> against <b>columns</b>, configured by <code>matrixConfig</code> with three render modes:</p>
+      <table>
+        <tr><th>Render mode</th><th>Behaviour</th><th>Columns from</th></tr>
+        <tr><td><code>SegmentedButton</code></td><td>One radio choice per row (default)</td><td><code>columnOptions[]</code> <code>{label,value}</code></td></tr>
+        <tr><td><code>Dropdown</code></td><td>Pick one per row from a dropdown</td><td><code>columnOptions[]</code></td></tr>
+        <tr><td><code>Input</code></td><td>Numeric/text entry per row</td><td><code>columnUnit</code> / <code>columnPlaceholder</code></td></tr>
+      </table>
+      <p>Rows are defined in <code>rowItems[]</code> as <code>{id, label}</code>. Row and column labels are translatable.</p>
+    </section>
+
+    <!-- 10 -->
+    <section id="roster">
+      <h2><span class="n">10</span> Roster (Repeat)</h2>
+      <p>A Roster repeats a block of sub-questions once per “row” (e.g. per household member or per land plot).</p>
+      <ul>
+        <li><code>items[]</code> — the nested sub-questions (any type, fully configured, recursively translatable).</li>
+        <li><code>iterationQuestionId</code> — links to a <b>Number</b> question whose answer sets how many rows to collect (dynamic count).</li>
+        <li><code>iterationType</code> / <code>iterationCount</code> — for fixed-count rosters.</li>
+      </ul>
+      <div class="note green">In the training document, the roster's own instruction (hint/note) stays directly under its header, and the repeated sub-questions are listed below it.</div>
+    </section>
+
+    <!-- 11 -->
+    <section id="hfc">
+      <h2><span class="n">11</span> HFC — High-Frequency Checks (Form-Checks)</h2>
+      <p>Per-question quality rules stored in <code>formChecks[]</code>. Each rule fires when its conditions match and then applies an action. This is the data-quality engine that runs on-device during collection.</p>
+      <pre>"formChecks": [{
+  <span class="k">"id"</span>: "hfc_age_plausible",
+  <span class="k">"action"</span>: "reask_once",
+  <span class="k">"match"</span>: "all",
+  <span class="k">"severity"</span>: "Soft",
+  <span class="k">"show_sup"</span>: 1,
+  <span class="k">"logic"</span>: [ { "attr": "q_age", "op": "<", "val": "1" },
+             { "attr": "q_age", "op": ">", "val": "120" } ],
+  <span class="k">"msg"</span>: "Age outside plausible range — please re-confirm."
+}]</pre>
+      <div class="grid2">
+        <div>
+          <h3>Action — what happens on match</h3>
+          <table>
+            <tr><td><span class="pill p-grey">flag_silently</span></td><td>Record a flag, no prompt.</td></tr>
+            <tr><td><span class="pill p-blue">reask_once</span></td><td>Re-ask once, then accept &amp; flag.</td></tr>
+            <tr><td><span class="pill p-amber">reask_and_flag</span></td><td>Re-ask; always flag.</td></tr>
+            <tr><td><span class="pill p-red">block</span></td><td>Block until corrected.</td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>Severity</h3>
+          <p>
+            <span class="pill p-red">Critical</span>
+            <span class="pill p-amber">Hard</span>
+            <span class="pill p-blue">Soft</span>
+            <span class="pill p-grey">Observation</span>
+          </p>
+          <h3>Combinator (<code>match</code>)</h3>
+          <p><span class="pill p-grey">all</span> = AND &nbsp; · &nbsp; <span class="pill p-grey">any</span> = OR</p>
+          <h3>Supervisor</h3>
+          <p><code>show_sup</code> = surface the flag to the supervisor in review.</p>
+        </div>
+      </div>
+      <h3>Condition operators (<code>logic[].op</code>)</h3>
+      <p>
+        <span class="pill p-grey">=</span> <span class="pill p-grey">!=</span>
+        <span class="pill p-grey">&gt;</span> <span class="pill p-grey">&gt;=</span>
+        <span class="pill p-grey">&lt;</span> <span class="pill p-grey">&lt;=</span>
+        <span class="pill p-grey">contains</span> <span class="pill p-grey">in</span>
+        <span class="pill p-grey">empty</span> <span class="pill p-grey">not_empty</span>
+      </p>
+      <p><code>attr</code> references a <b>Core Attribute code</b> or a <code>questionId</code>, so rules can compare across questions (e.g. low income vs. large household).</p>
+    </section>
+
+    <!-- 12 -->
+    <section id="lookup">
+      <h2><span class="n">12</span> Lookups &amp; Attachments</h2>
+      <p>Forms can carry attached files, managed via <em>Manage Lookup Tables</em> and the attachment API. Supported attachment types:</p>
+      <p>
+        <span class="pill p-blue">LOOKUP</span>
+        <span class="pill p-blue">EXTERNAL_FILE</span>
+        <span class="pill p-purple">MEDIA_AUDIO</span>
+        <span class="pill p-purple">MEDIA_VIDEO</span>
+        <span class="pill p-purple">MEDIA_IMAGE</span>
+      </p>
+      <p>Lookups provide reference datasets (e.g. village lists) the form can read; media attachments back hints and instructions. Attachments are versioned with the form and can be language-scoped.</p>
+    </section>
+
+  </main>
+</div>
+</body>
+</html>

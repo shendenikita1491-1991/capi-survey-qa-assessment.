@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android — Data Collection App</title>
+<style>
+  :root {
+    --brand: #059669; /* Android green-ish tone */
+    --accent: #2563eb;
+    --ink: #111827;
+    --ink2: #4b5563;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --line: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+    background: var(--bg); 
+    color: var(--ink); 
+    line-height: 1.6; 
+    padding: 20px;
+  }
+  .container { 
+    max-width: 900px; 
+    margin: 20px auto; 
+    padding: 40px 50px; 
+    background: var(--card); 
+    border-radius: 12px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+  }
+  h1 { 
+    font-size: 32px; 
+    color: var(--ink); 
+    border-bottom: 3px solid var(--brand); 
+    padding-bottom: 12px; 
+    margin-bottom: 24px; 
+  }
+  h2 { 
+    font-size: 22px; 
+    color: var(--brand); 
+    margin-top: 32px; 
+    margin-bottom: 12px; 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h3 { 
+    font-size: 18px; 
+    color: var(--ink); 
+    margin-top: 24px; 
+    margin-bottom: 10px; 
+  }
+  p { margin-bottom: 12px; color: var(--ink2); }
+  ul, ol { margin-bottom: 16px; padding-left: 24px; color: var(--ink2); }
+  li { margin-bottom: 6px; }
+  strong { color: var(--ink); }
+  
+  .pill { 
+    display: inline-block; 
+    background: #ecfdf5; 
+    color: #065f46; 
+    padding: 2px 8px; 
+    border-radius: 6px; 
+    font-size: 13px; 
+    font-weight: 600; 
+    border: 1px solid #a7f3d0;
+  }
+  
+  .note { 
+    background: #eff6ff; 
+    border-left: 4px solid var(--accent); 
+    padding: 16px; 
+    margin: 20px 0; 
+    border-radius: 0 8px 8px 0; 
+    color: #1e3a8a; 
+    font-size: 15px;
+  }
+  
+  .code-block { 
+    background: #1f2937; 
+    color: #e5e7eb; 
+    padding: 16px; 
+    border-radius: 8px; 
+    overflow-x: auto; 
+    font-family: 'Courier New', Courier, monospace; 
+    font-size: 14px; 
+    margin: 16px 0;
+  }
+  
+  .example-box { 
+    border: 1px solid var(--line); 
+    border-radius: 8px; 
+    padding: 24px; 
+    background: #fafafa; 
+    margin: 20px 0; 
+  }
+  .example-box h4 { margin-bottom: 12px; color: var(--ink); font-size: 16px; }
+  
+  /* Number circles for sections */
+  .num {
+    background: var(--brand);
+    color: white;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Data Collection App</h1>
+  
+  <p><strong>Purpose:</strong> Android app that <strong>trains rural users</strong> and enables them to easily collect and sync school survey data.</p>
+  
+  <p>The app will have two main jobs:</p>
+  <ol>
+    <li><strong>Training:</strong> Teach the user how to become a data collector using simple, visual-heavy lessons and quizzes in multiple video training modules.</li>
+    <li><strong>Data Collection:</strong> Provide an easy, offline-first form to capture field data and safely sync it when the internet connects.</li>
+  </ol>
+
+  <div class="note">
+    <strong>User Constraints:</strong> Design for budget phones, low-internet connectivity, and limited reading skills.<br><br>
+  </div>
+
+  <h2>App Flow & Screens</h2>
+
+  <h3><span class="num">1</span> Onboarding</h3>
+  <p>Create a highly accessible profile setup flow:</p>
+  <ul>
+    <li><strong>Login:</strong> Phone number with mock OTP verification.</li>
+    <li><strong>Profile Details:</strong> Name, Location, Date of Birth, and Education Level.</li>
+    <li><strong>UX Constraint:</strong> Keep forms simple, visual, and easy to navigate for users who struggle with reading.</li>
+  </ul>
+
+  <h3><span class="num">2</span> The Main Dashboard (Central Hub)</h3>
+  <p>Create a central dashboard that acts as the home screen once onboarding is complete. It must clearly display the user's current status across the platform:</p>
+  <ul>
+    <li><strong>Profile Status:</strong> A brief welcome showing they are onboarded.</li>
+    <li><strong>Training Status:</strong> A visual indicator showing whether their training is "Pending," "In Progress," or "Completed." (If incomplete, tapping this takes them to the Training Phase).</li>
+    <li><strong>Survey Progress:</strong> A summary of their data collection work (e.g., "3 Surveys Pending Sync", "10 Surveys Synced").</li>
+  </ul>
+
+  <h3><span class="num">3</span> Training Phase</h3>
+  <p><strong>Users must pass a training sequence</strong> before they can collect data.</p>
+  <ul>
+    <li><strong>Mock Videos:</strong> Show 2-3 training modules (e.g., “How to collect data”, "Approaching the School", “Handling no internet”).<br>
+    <em>Note: <strong>Do not</strong> build a real video player — just use a thumbnail and a "Watch Video" button that fakes completion after a few seconds.</em></li>
+    <li><strong>The Quiz:</strong> After a video finishes, the user must answer a single multiple-choice question correctly to unlock the next module.</li>
+    <li><strong>UX Constraint:</strong> Design the quiz for low-literacy users. Rely on visual answers (icons/images), clear color feedback (green for right, red for wrong), and large touch targets.</li>
+  </ul>
+
+  <h3><span class="num">4</span> Data Collection (Offline-First)</h3>
+  <p>Once training is passed, unlock the "Survey" feature.</p>
+  <ul>
+    <li><strong>The Form:</strong> Dynamically load data from <code>sample_survey_schema.json</code>.</li>
+    <li><strong>Offline Storage:</strong> Users must be able to fill out and save this form completely offline (e.g., using Room).</li>
+    <li><strong>Background Sync:</strong> When the device gets an internet connection, automatically sync the saved surveys in the background (e.g., using WorkManager).</li>
+  </ul>
+
+  <hr style="border: 0; border-top: 1px solid var(--line); margin: 40px 0;">
+
+  <h2>Considerations for the App Engine</h2>
+
+  <h3>1. Visibility Logic</h3>
+  <p>Each question can include a <code>visibilityLogic</code> object that defines whether it should be shown or hidden based on another question’s answer. The logic works only when <code>"enabled": true</code>. If <code>"enabled": false</code>, the question should always be visible.</p>
+  <p><strong>How it works:</strong></p>
+  <ul>
+    <li>Check the user’s input for the question referenced by <code>targetQuestion</code>.</li>
+    <li>Compare that input with the <code>value</code> using the given <code>condition</code>.</li>
+    <li>If the condition is true, show the current question; otherwise, hide it.</li>
+  </ul>
+
+  <h3>2. Validation Rules</h3>
+  <p>Each question can include a <code>validationRules</code> object to specify how user input should be checked before submission. For this exercise, two types of validation exist in the schema:</p>
+  <div class="code-block">
+"validationRules": { "type": "range", "min": "0", "max": "24" }
+"validationRules": { "type": "text" }
+  </div>
+
+  <h3>3. FormCheck (HFC) Rules</h3>
+  <p>Some questions can include a <code>formChecks</code> array to specify complex logic checks. For this exercise, you only need to handle "Soft" severity checks like this one:</p>
+  <div class="code-block">
+"formChecks": [
+  {
+    "id": "hfc_sleep_plausible",
+    "action": "reask_once",
+    "severity": "Soft",
+    "logic": [
+      { "attr": "q_3", "op": ">", "val": "16" }
+    ],
+    "msg": "That's an unusually high number of hours. Please confirm."
+  }
+]
+  </div>
+
+  <h3>4. Display Structure</h3>
+  <p>When rendering the form from the JSON schema, follow this visual and logical order:</p>
+  <div class="example-box" style="background: #f8fafc; border-color: #cbd5e1;">
+    <strong>&lt;Survey Title&gt;</strong><br><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<strong>&lt;Section Title&gt;</strong><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;Section Hint / Checklist&gt;<br><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>&lt;Question Text&gt;</strong><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Question Hint Text&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>[Input Control / Options]</em><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;Checklist Guide&gt;<br><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<strong>[Action Buttons (e.g., Next, Submit)]</strong>
+  </div>
+
+  <h3>Example Layout Visualization</h3>
+  <div class="example-box">
+    <h4>Student Daily Habits Survey</h4>
+    <p><span class="pill">Section</span> <strong>Play & Meals</strong><br>
+    <em>Hint: Ask about time for play and meal habits.</em></p>
+
+    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--line);">
+      <p><strong>Q:</strong> Do you play outside after school?<br>
+      <em>Hint: Yes or No question about outdoor play.</em></p>
+      <p style="margin: 8px 0;">
+        <select style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px;">
+          <option>Dropdown: Yes / No</option>
+        </select>
+      </p>
+      <p style="font-size: 13px; color: #64748b;"><em>Checklist: If “Yes,” ask what games.</em></p>
+    </div>
+
+    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--line);">
+      <p><strong>Q:</strong> What games do you play?<br>
+      <em>Hint: Short list or single answer (e.g., “football”).</em></p>
+      <p style="margin: 8px 0;">
+        <input type="text" placeholder="[Text Input]" style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 300px;">
+      </p>
+      <p style="font-size: 13px; color: #64748b;"><em>Checklist: Ask only when previous answer = “Yes.”</em></p>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <button style="background: var(--brand); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Submit Button</button>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
