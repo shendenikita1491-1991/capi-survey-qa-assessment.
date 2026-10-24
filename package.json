@@ -1,0 +1,20 @@
+{
+  "name": "capi-survey-qa-assessment",
+  "version": "1.0.0",
+  "description": "QA take-home: offline sync API tests, schema-driven skip logic tests, test plans",
+  "private": true,
+  "scripts": {
+    "server": "node mock-server/server.js",
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:web": "playwright test --project=web",
+    "test:buggy": "cross-env MOCK_BUG=overwrite PORT=3457 playwright test --project=api",
+    "report": "playwright show-report",
+    "verify:buggy": "node scripts/verify-buggy-server.js",
+    "test:postman": "npx --yes newman run postman/sync-survey.postman_collection.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "cross-env": "^7.0.3"
+  }
+}
