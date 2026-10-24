@@ -1,0 +1,24 @@
+name: QA tests
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Unit (schema contract + HFC), API and web tests
+        run: npx playwright test
+      - name: Prove the API tests catch the overwrite bug (the right tests must fail)
+        run: npm run verify:buggy
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
