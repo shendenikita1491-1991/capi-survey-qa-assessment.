@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survey Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background: #f5f6f8; color: #1d2733; font-size: 18px; }
+    main { max-width: 640px; margin: 0 auto; }
+    .question { background: #fff; border: 1px solid #d5dbe3; border-radius: 8px; padding: 14px; margin: 12px 0; }
+    .question[hidden] { display: none; }
+    .question > label, .question legend { font-weight: bold; display: block; margin-bottom: 8px; }
+    fieldset { border: 0; padding: 0; margin: 0; }
+    .hint { color: #4a5868; font-size: 15px; margin: -4px 0 8px; }
+    .checklist, .section-checklist { color: #3b4a5a; font-size: 15px; background: #eef3fb; border-radius: 6px; padding: 8px 10px; margin-top: 8px; }
+    .checklist::before, .section-checklist::before { content: "\2611  "; }
+    .section-title { font-size: 20px; margin: 24px 0 4px; color: #2f6fdb; }
+    select, input[type=text], input[type=number], input[type=date] { width: 100%; box-sizing: border-box; font-size: 18px; padding: 10px; }
+    .choice { display: flex; align-items: center; gap: 10px; min-height: 48px; }
+    .choice input { width: 24px; height: 24px; }
+    .req { color: #b00020; }
+    .error { color: #b00020; font-size: 15px; margin-top: 6px; }
+    .roster { border-left: 4px solid #2f6fdb; padding-left: 10px; margin: 10px 0; }
+    .hfc { background: #fff4e5; border: 2px solid #e08a00; border-radius: 8px; padding: 14px; margin: 12px 0; }
+    button { font-size: 18px; min-height: 48px; padding: 0 20px; border-radius: 8px; border: 0; background: #2f6fdb; color: #fff; }
+    button.secondary { background: #e3e8ef; color: #1d2733; }
+    pre { background: #0f1720; color: #d6e2f0; padding: 12px; overflow: auto; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 id="survey-title">Loading…</h1>
+    <form id="survey" novalidate></form>
+    <div id="hfc" class="hfc" data-testid="hfc-alert" hidden></div>
+    <button type="button" id="submit" data-testid="submit">Submit</button>
+    <h2 hidden id="out-title">Submitted data</h2>
+    <pre id="output" data-testid="submission" hidden></pre>
+  </main>
+  <script src="/web/logic.js"></script>
+  <script src="/web/builder-format.js"></script>
+  <script src="/web/renderer.js"></script>
+</body>
+</html>
