@@ -1,0 +1,65 @@
+{
+  "surveys": [
+    {
+      "surveyData": {
+        "id": "sleep_check_v1",
+        "version": "1.0.0",
+        "language": "en",
+        "title": "Sleep Check (Android spec HFC example)",
+        "sections": [
+          {
+            "sectionId": "sec_1",
+            "title": "Sleep",
+            "learningOutcome": "Record last night's sleep",
+            "sectionChecklist": "Ask about last night only, not a usual night.",
+            "questions": [
+              {
+                "questionId": "q_1",
+                "questionText": "How old are you?",
+                "hintText": "Age in completed years.",
+                "inputType": "Number",
+                "isRequired": true,
+                "validationRules": { "type": "range", "min": "0", "max": "120" },
+                "checklistGuide": "Check the age against the ID card if available.",
+                "visibilityLogic": { "enabled": false },
+                "formChecks": [
+                  { "id": "hfc_age_too_low", "action": "block", "match": "all", "severity": "Hard", "show_sup": 1,
+                    "logic": [ { "attr": "q_1", "op": "<", "val": "5" } ],
+                    "msg": "Age under 5 is not allowed in this survey. Please correct it." },
+                  { "id": "hfc_age_very_old", "action": "flag_silently", "match": "all", "severity": "Observation", "show_sup": 1,
+                    "logic": [ { "attr": "q_1", "op": ">", "val": "100" } ],
+                    "msg": "Age over 100 - supervisor to review." }
+                ]
+              },
+              {
+                "questionId": "q_2",
+                "questionText": "Did you sleep well last night?",
+                "hintText": "Yes or No.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "isRequired": true,
+                "validationRules": { "type": "text" },
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_3",
+                "questionText": "How many hours did you sleep?",
+                "hintText": "Number of hours, 0 to 24.",
+                "inputType": "Number",
+                "isRequired": true,
+                "validationRules": { "type": "range", "min": "0", "max": "24" },
+                "checklistGuide": "Count from going to bed to waking up.",
+                "visibilityLogic": { "enabled": false },
+                "formChecks": [
+                  { "id": "hfc_sleep_plausible", "action": "reask_once", "match": "all", "severity": "Soft", "show_sup": 1,
+                    "logic": [ { "attr": "q_3", "op": ">", "val": "16" } ],
+                    "msg": "That's an unusually high number of hours. Please confirm." }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

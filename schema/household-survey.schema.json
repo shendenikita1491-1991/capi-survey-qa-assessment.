@@ -1,0 +1,83 @@
+{
+  "survey_id": "household_survey_v1",
+  "title": "Household Survey",
+  "schema_version": 3,
+  "languages": ["en"],
+  "questions": [
+    { "id": "respondent_name", "type": "text", "label": "Respondent name", "required": true },
+    {
+      "id": "has_hobby", "type": "select_one", "label": "Do you have a hobby?", "required": true,
+      "options": [ { "value": "yes", "label": "Yes" }, { "value": "no", "label": "No" } ]
+    },
+    {
+      "id": "hobby_name", "type": "text", "label": "What is your hobby?", "required": true,
+      "visible_if": { "question": "has_hobby", "op": "eq", "value": "yes" }
+    },
+    {
+      "id": "hobby_hours", "type": "integer", "label": "Hours per week spent on your hobby", "min": 0, "max": 168,
+      "visible_if": { "all": [ { "question": "has_hobby", "op": "eq", "value": "yes" }, { "question": "hobby_name", "op": "not_empty" } ] }
+    },
+    { "id": "age", "type": "integer", "label": "Age (years)", "required": true, "min": 0, "max": 120 },
+    {
+      "id": "education", "type": "select_one", "label": "Highest education", "required": true,
+      "options": [
+        { "value": "none", "label": "None" }, { "value": "primary", "label": "Primary" },
+        { "value": "secondary", "label": "Secondary" }, { "value": "college", "label": "College" }
+      ]
+    },
+    {
+      "id": "college_name", "type": "text", "label": "Name of college",
+      "visible_if": { "question": "education", "op": "eq", "value": "college" }
+    },
+    {
+      "id": "is_employed", "type": "select_one", "label": "Are you currently employed?",
+      "visible_if": { "question": "age", "op": "gte", "value": 18 },
+      "options": [ { "value": "yes", "label": "Yes" }, { "value": "no", "label": "No" } ]
+    },
+    {
+      "id": "income_sources", "type": "select_multiple", "label": "Sources of household income",
+      "options": [
+        { "value": "farming", "label": "Farming" }, { "value": "labour", "label": "Daily labour" },
+        { "value": "business", "label": "Small business" }, { "value": "other", "label": "Other" }
+      ]
+    },
+    {
+      "id": "income_other", "type": "text", "label": "Other income source (specify)", "required": true,
+      "visible_if": { "question": "income_sources", "op": "contains", "value": "other" }
+    },
+    {
+      "id": "sleep_well", "type": "select_one", "label": "Do you sleep well?",
+      "options": [ { "value": "yes", "label": "Yes" }, { "value": "no", "label": "No" } ]
+    },
+    { "id": "sleep_hours", "type": "decimal", "label": "Hours of sleep per night", "min": 0, "max": 24 },
+    { "id": "household_size", "type": "integer", "label": "How many people live in this household?", "required": true, "min": 1, "max": 30 },
+    {
+      "id": "members", "type": "repeat", "label": "Household member", "repeat_count": "household_size",
+      "questions": [
+        { "id": "member_name", "type": "text", "label": "Member name", "required": true },
+        { "id": "member_age", "type": "integer", "label": "Member age", "required": true, "min": 0, "max": 120 },
+        {
+          "id": "member_in_school", "type": "select_one", "label": "Is this member attending school?",
+          "visible_if": { "question": "member_age", "op": "lt", "value": 18 },
+          "options": [ { "value": "yes", "label": "Yes" }, { "value": "no", "label": "No" } ]
+        }
+      ]
+    }
+  ],
+  "hfc_rules": [
+    {
+      "id": "HFC_AGE_EDU",
+      "when": { "all": [ { "question": "age", "op": "lt", "value": 15 }, { "question": "education", "op": "eq", "value": "college" } ] },
+      "action": "reask_and_flag",
+      "questions": ["age", "education"],
+      "message": "Age is under 15 but education is College. Please check both answers."
+    },
+    {
+      "id": "HFC_SLEEP",
+      "when": { "all": [ { "question": "sleep_well", "op": "eq", "value": "yes" }, { "question": "sleep_hours", "op": "lt", "value": 6 } ] },
+      "action": "reask_and_flag",
+      "questions": ["sleep_well", "sleep_hours"],
+      "message": "Sleeps well but less than 6 hours. Please confirm."
+    }
+  ]
+}
