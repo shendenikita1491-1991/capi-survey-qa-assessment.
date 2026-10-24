@@ -1,0 +1,370 @@
+{
+  "surveys": [
+    {
+      "surveyData": {
+        "title": "Student Daily Habits Survey",
+        "sections": [
+          {
+            "sectionId": "sec_1",
+            "title": "About You",
+            "sectionChecklist": "• Ask name and grade. • Fill answers exactly as told.",
+            "questions": [
+              {
+                "questionId": "q_1",
+                "questionText": "What is your name?",
+                "questionHintText": "Write the student's name.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Spell the name as said.",
+                "isRequired": true,
+                "validationRules": { "type": "text" },
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_2",
+                "questionText": "Which grade are you in?",
+                "hintText": "Say your class or grade (e.g., 3rd, 4th).",
+                "inputType": "Dropdown",
+                "options": ["1st", "2nd", "3rd", "4th", "5th", "Other"],
+                "checklistGuide": "• Pick the correct grade.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              }
+            ]
+          },
+          {
+            "sectionId": "sec_2",
+            "title": "Daily Routine",
+            "learningOutcome": "Understand simple daily habits like play and study time.",
+            "sectionChecklist": "• Ask about playtime and homework. • Keep tone friendly.",
+            "questions": [
+              {
+                "questionId": "q_3",
+                "questionText": "Do you do homework every day?",
+                "hintText": "Ask if they usually do homework each school day.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'No', ask why in next question.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_4",
+                "questionText": "Why not? (If you said No)",
+                "hintText": "Short answer: e.g., 'busy', 'help needed', 'no homework'.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Ask this only when q_3 = 'No'.",
+                "isRequired": false,
+                "validationRules": [],
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_3",
+                  "condition": "equals",
+                  "value": "No"
+                }
+              }
+            ]
+          },
+          {
+            "sectionId": "sec_3",
+            "title": "Play & Meals",
+            "learningOutcome": "Capture simple info about playtime and snacks.",
+            "sectionChecklist": "• Ask about time for play and meal habits.",
+            "questions": [
+              {
+                "questionId": "q_5",
+                "questionText": "Do you play outside after school?",
+                "hintText": "Yes or No question about outdoor play.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'Yes', ask what games.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_6",
+                "questionText": "What games do you play? (If Yes)",
+                "hintText": "Short list or single answer (e.g., 'football').",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Ask only when q_5 = 'Yes'.",
+                "isRequired": false,
+                "validationRules": [],
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_5",
+                  "condition": "equals",
+                  "value": "Yes"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "surveyData": {
+        "title": "Student Wellbeing Short Survey",
+        "sections": [
+          {
+            "sectionId": "sec_1",
+            "title": "Feeling Today",
+            "learningOutcome": "Quick check of the student's mood and energy.",
+            "sectionChecklist": "• Ask kindly and listen. • Record answers exactly.",
+            "questions": [
+              {
+                "questionId": "q_1",
+                "questionText": "How do you feel today?",
+                "hintText": "Choose one: happy, okay, sad, tired.",
+                "inputType": "Dropdown",
+                "options": ["Happy", "Okay", "Sad", "Tired"],
+                "checklistGuide": "• Encourage honest reply.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_2",
+                "questionText": "Did you sleep well last night?",
+                "hintText": "Yes if they slept well, No if they had trouble.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'No', ask follow-up.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_3",
+                "questionText": "How many hours did you sleep? (If No)",
+                "hintText": "Approximate hours, e.g., 5, 6, 7.",
+                "inputType": "Number",
+                "options": [],
+                "checklistGuide": "• Ask only when q_2 = 'No'.",
+                "isRequired": false,
+                "validationRules": { "type": "range", "min": "0", "max": "24" },
+                "formChecks": [
+                  {
+                    "id": "hfc_sleep_plausible",
+                    "action": "reask_once",
+                    "match": "all",
+                    "severity": "Soft",
+                    "show_sup": 1,
+                    "logic": [
+                      { "questioID": "q_2", "op": "=", "val": "Yes" }
+                      { "questioID": "q_3", "op": "<", "val": "6" }
+                    ],
+                    "msg": "That's an unusually low number of hours for sleeping standard. Please confirm."
+                  }
+                ],
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_2",
+                  "condition": "equals",
+                  "value": "No"
+                }
+              }
+            ]
+          },
+          {
+            "sectionId": "sec_2",
+            "title": "Eating Habits",
+            "learningOutcome": "Know if the student had meals and snacks today.",
+            "sectionChecklist": "• Check if meals were eaten today.",
+            "questions": [
+              {
+                "questionId": "q_4",
+                "questionText": "Did you eat breakfast today?",
+                "hintText": "Yes or No.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'No', ask why.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_5",
+                "questionText": "Why not? (If No to breakfast)",
+                "hintText": "Short reason, e.g., 'no time', 'not hungry'.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Ask only when q_4 = 'No'.",
+                "isRequired": false,
+                "validationRules": [],
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_4",
+                  "condition": "equals",
+                  "value": "No"
+                }
+              }
+            ]
+          },
+          {
+            "sectionId": "sec_3",
+            "title": "Help & Support",
+            "learningOutcome": "See if the student needs help from teachers or family.",
+            "sectionChecklist": "• Be supportive. • Offer help if needed.",
+            "questions": [
+              {
+                "questionId": "q_6",
+                "questionText": "Do you want to talk to a teacher about any worry?",
+                "hintText": "Yes if they want to talk to teacher.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'Yes', note preferred teacher or subject.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_7",
+                "questionText": "Who would you like to talk to? (If Yes)",
+                "hintText": "Teacher name or family member.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Ask only when q_6 = 'Yes'.",
+                "isRequired": false,
+                "validationRules": { "type": "text" },
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_6",
+                  "condition": "equals",
+                  "value": "Yes"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "surveyData": {
+        "title": "Student Interests & Hobbies",
+        "sections": [
+          {
+            "sectionId": "sec_1",
+            "title": "Favorite Things",
+            "learningOutcome": "Find out simple likes: subject, game, or hobby.",
+            "sectionChecklist": "• Be casual and friendly. • Let student pick one or write it down.",
+            "questions": [
+              {
+                "questionId": "q_1",
+                "questionText": "What is your favorite subject at school?",
+                "hintText": "e.g., Math, Science, Art.",
+                "inputType": "Dropdown",
+                "options": ["Math", "Science", "Reading", "Art", "Other"],
+                "checklistGuide": "• If 'Other', ask to specify.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_2",
+                "questionText": "Please name the subject if 'Other'.",
+                "hintText": "Write the subject name.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Only ask when q_1 = 'Other'.",
+                "isRequired": false,
+                "validationRules": { "type": "text" },
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_1",
+                  "condition": "equals",
+                  "value": "Other"
+                }
+              }
+            ]
+          },
+          {
+            "sectionId": "sec_2",
+            "title": "Hobbies",
+            "learningOutcome": "Record play and hobby preferences.",
+            "sectionChecklist": "• Ask about single or multiple hobbies.",
+            "questions": [
+              {
+                "questionId": "q_3",
+                "questionText": "Do you have a hobby?",
+                "hintText": "Yes or No.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'Yes', ask what hobby.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_4",
+                "questionText": "What is your hobby? (If Yes)",
+                "hintText": "e.g., drawing, dancing, football.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Ask only when q_3 = 'Yes'.",
+                "isRequired": false,
+                "validationRules": [],
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_3",
+                  "condition": "equals",
+                  "value": "Yes"
+                }
+              }
+            ]
+          },
+          {
+            "sectionId": "sec_3",
+            "title": "Learning Preferences",
+            "learningOutcome": "Simple questions on how the student likes to learn.",
+            "sectionChecklist": "• Keep examples: reading, watching videos, doing experiments.",
+            "questions": [
+              {
+                "questionId": "q_5",
+                "questionText": "How do you like to learn?",
+                "hintText": "Pick one: by listening, by doing, by reading.",
+                "inputType": "Dropdown",
+                "options": ["By Listening", "By Doing", "By Reading"],
+                "checklistGuide": "• Choose one option.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_6",
+                "questionText": "Would you like extra activities after school?",
+                "hintText": "Yes or No.",
+                "inputType": "Dropdown",
+                "options": ["Yes", "No"],
+                "checklistGuide": "• If 'Yes', note preferred activity in next question.",
+                "isRequired": true,
+                "validationRules": [],
+                "visibilityLogic": { "enabled": false }
+              },
+              {
+                "questionId": "q_7",
+                "questionText": "Which extra activity would you like? (If Yes)",
+                "hintText": "e.g., Art club, Sports club, Science club.",
+                "inputType": "Text",
+                "options": [],
+                "checklistGuide": "• Ask only when q_6 = 'Yes'.",
+                "isRequired": false,
+                "validationRules": [],
+                "visibilityLogic": {
+                  "enabled": true,
+                  "targetQuestion": "q_6",
+                  "condition": "equals",
+                  "value": "Yes"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
